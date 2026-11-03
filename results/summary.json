@@ -1,0 +1,355 @@
+{
+ "cables": {
+  "cable70": {
+   "name": "cable70",
+   "designation": "Barrinax U-1000 R2V 1x70 mm2 (0.6/1 kV, XLPE/PVC)",
+   "D1_conductor_mm": 9.5,
+   "D2_over_insulation_mm": 11.700000000000001,
+   "D3_outer_mm": 14.700000000000001,
+   "S_eff_mm2": 70.0,
+   "S_geometric_mm2": 70.8821842466197,
+   "fill_factor": 0.9875542175231179,
+   "r20_ohm_per_km": 0.2642857142857143,
+   "conductor_mass_kg_per_m": 0.584,
+   "conductor_density_effective": 8239.02375762144,
+   "insulation": "XLPE",
+   "jacket": "PVC",
+   "ambient_C": 19.0
+  },
+  "cable150": {
+   "name": "cable150",
+   "designation": "H07RN-F TITANEX 1x150 mm2",
+   "D1_conductor_mm": 15.0,
+   "D2_over_insulation_mm": 19.0,
+   "D3_outer_mm": 24.0,
+   "S_eff_mm2": 150.0,
+   "S_geometric_mm2": 176.71458676442586,
+   "fill_factor": 0.8488263631567752,
+   "r20_ohm_per_km": 0.12333333333333334,
+   "conductor_mass_kg_per_m": 1.74,
+   "conductor_density_effective": 9846.385812618591,
+   "insulation": "XLPE",
+   "jacket": "PVC",
+   "ambient_C": 23.5
+  }
+ },
+ "comparison_with_paper": {
+  "cable70/paper": {
+   "conductor_insulation": {
+    "rms_K": 3.5498764665272153,
+    "mean_K": 3.396098899965127,
+    "max_abs_K": 5.701544283872387,
+    "mean_rel_pct": 11.039568022781836,
+    "end_model_C": 45.010344283872385,
+    "end_paper_C": 39.3088
+   },
+   "insulation_jacket": {
+    "rms_K": 4.102363872134501,
+    "mean_K": 3.9354604207521664,
+    "max_abs_K": 6.187467205969604,
+    "mean_rel_pct": 13.275696941949157,
+    "end_model_C": 43.709567205969606,
+    "end_paper_C": 37.5221
+   },
+   "jacket_air": {
+    "rms_K": 3.304751849360048,
+    "mean_K": 3.1881782373822354,
+    "max_abs_K": 5.1458628516179274,
+    "mean_rel_pct": 11.211495458233404,
+    "end_model_C": 40.35176285161793,
+    "end_paper_C": 35.2059
+   },
+   "all": {
+    "rms_K": 3.669102832531773,
+    "mean_K": 3.5080358764491018
+   }
+  },
+  "cable70/ieee738": {
+   "conductor_insulation": {
+    "rms_K": 3.3079707958103874,
+    "mean_K": 3.1736611426270054,
+    "max_abs_K": 5.283829443593746,
+    "mean_rel_pct": 10.354036768585164,
+    "end_model_C": 44.592629443593744,
+    "end_paper_C": 39.3088
+   },
+   "insulation_jacket": {
+    "rms_K": 3.857550627598412,
+    "mean_K": 3.7118727164800482,
+    "max_abs_K": 5.771964994989808,
+    "mean_rel_pct": 12.556111635818015,
+    "end_model_C": 43.29406499498981,
+    "end_paper_C": 37.5221
+   },
+   "jacket_air": {
+    "rms_K": 3.062253621738451,
+    "mean_K": 2.9615332912028656,
+    "max_abs_K": 4.7386136462444455,
+    "mean_rel_pct": 10.452096659310069,
+    "end_model_C": 39.944513646244445,
+    "end_paper_C": 35.2059
+   },
+   "all": {
+    "rms_K": 3.4269980990593782,
+    "mean_K": 3.2838183667217806
+   }
+  },
+  "cable150/paper": {
+   "conductor_insulation": {
+    "rms_K": 0.43855435884576016,
+    "mean_K": -0.41112162108768074,
+    "max_abs_K": 0.8501202263943242,
+    "mean_rel_pct": -1.3952316483936402,
+    "end_model_C": 38.72847585982615,
+    "end_paper_C": 39.5424
+   },
+   "insulation_jacket": {
+    "rms_K": 0.3727671412835994,
+    "mean_K": -0.34822029334966537,
+    "max_abs_K": 0.8731200380808204,
+    "mean_rel_pct": -1.2052013089678435,
+    "end_model_C": 37.294607570216115,
+    "end_paper_C": 37.8543
+   },
+   "jacket_air": {
+    "rms_K": 1.1079324710219367,
+    "mean_K": -0.9319315254226971,
+    "max_abs_K": 2.4760024912038006,
+    "mean_rel_pct": -3.1107077729849566,
+    "end_model_C": 34.56164011775287,
+    "end_paper_C": 37.001
+   },
+   "all": {
+    "rms_K": 0.7085536515236971,
+    "mean_K": -0.554629539432069
+   }
+  },
+  "cable150/ieee738": {
+   "conductor_insulation": {
+    "rms_K": 0.4642205972793955,
+    "mean_K": -0.4308792131983596,
+    "max_abs_K": 0.922551476339919,
+    "mean_rel_pct": -1.4559526876982636,
+    "end_model_C": 38.65404615601976,
+    "end_paper_C": 39.5424
+   },
+   "insulation_jacket": {
+    "rms_K": 0.40074153583625133,
+    "mean_K": -0.3699644208646995,
+    "max_abs_K": 0.9516453815331403,
+    "mean_rel_pct": -1.2740001094361522,
+    "end_model_C": 37.21398577005778,
+    "end_paper_C": 37.8543
+   },
+   "jacket_air": {
+    "rms_K": 1.1478625235289357,
+    "mean_K": -0.9616260816774582,
+    "max_abs_K": 2.569765187330738,
+    "mean_rel_pct": -3.206234770111656,
+    "end_model_C": 34.46114222193634,
+    "end_paper_C": 37.001
+   },
+   "all": {
+    "rms_K": 0.7388442803499654,
+    "mean_K": -0.5782138016989725
+   }
+  }
+ },
+ "heat_balance_cable70_end": {
+  "joule": 13.133508530604253,
+  "p_conv": 7.446768524627563,
+  "p_rad": 5.171289496713329,
+  "T_surface": 39.944513646244445
+ },
+ "energy_balance_error_W_per_m": {
+  "cable70/paper": 6.949560371616315e-10,
+  "cable70/ieee738": 5.502780453525702e-10,
+  "cable150/paper": 4.1395153971279797e-10,
+  "cable150/ieee738": 5.056781660073284e-10
+ },
+ "diagnostic_calibration": {
+  "cable70": {
+   "factors": {
+    "capacity_scale": 2.3425792361617357,
+    "h_scale": 1.3270864555744661
+   },
+   "rms_K": 0.4054176447220787
+  },
+  "cable150": {
+   "factors": {
+    "capacity_scale": 0.8455632146954154
+   },
+   "rms_K": 0.412918236988422
+  }
+ },
+ "verification": {
+  "cable70": {
+   "max_abs_diff_paper_scheme_K": 0.006760620022603803,
+   "convergence": [
+    [
+     3,
+     40,
+     0.11825172775630222
+    ],
+    [
+     5,
+     20,
+     0.09120276230519409
+    ],
+    [
+     9,
+     10,
+     0.006760620022603803
+    ],
+    [
+     18,
+     5,
+     0.0035656577749918483
+    ],
+    [
+     36,
+     2.5,
+     0.0018524597338824833
+    ]
+   ]
+  },
+  "cable150": {
+   "max_abs_diff_paper_scheme_K": 0.00870149974817025,
+   "convergence": [
+    [
+     3,
+     40,
+     0.2337138362100859
+    ],
+    [
+     5,
+     20,
+     0.07252075938500013
+    ],
+    [
+     9,
+     10,
+     0.00870149974817025
+    ],
+    [
+     18,
+     5,
+     0.00988459049801449
+    ],
+    [
+     36,
+     2.5,
+     0.009984261268787264
+    ]
+   ]
+  }
+ },
+ "steady_state": {
+  "cable70": {
+   "ambient_C": 19.0,
+   "ampacity_90C_model_A": 339.44553440107035,
+   "ampacity_90C_IEC60287_paper_k_A": 354.30073510134446,
+   "ampacity_90C_IEC60287_IEC_rhoT_A": 371.55240223719534,
+   "note": "property curves are clamped above 75 degC"
+  },
+  "cable150": {
+   "ambient_C": 23.5,
+   "ampacity_90C_model_A": 550.1220767345178,
+   "ampacity_90C_IEC60287_paper_k_A": 560.9940911516326,
+   "ampacity_90C_IEC60287_IEC_rhoT_A": 595.5402696346598,
+   "note": "property curves are clamped above 75 degC"
+  }
+ },
+ "short_circuit": {
+  "cable70": {
+   "I_load_A": 339.44553440107035,
+   "T_initial_C": 90.00000000000048,
+   "I_sc_A": 9274.81266934001,
+   "t_sc_s": 1.0,
+   "K_paper_data": 203.36156385420523,
+   "beta_paper_data": 212.5581395348837,
+   "K_IEC_copper": 225.6691613503016,
+   "T_max_model_center_C": 233.82952726313408,
+   "T_max_model_conductor_insulation_C": 232.80078662401226,
+   "T_final_IEC60949_adiabatic_C": 249.99999999999994,
+   "IEC60949_non_adiabatic_factor": 1.0507186586969959,
+   "T_final_IEC60949_non_adiabatic_C": 231.86621545044562,
+   "T_max_paper_dt10_C": 89.99201770831883
+  }
+ },
+ "dynamic": {
+  "T_max_conductor_C": 48.484275838235114,
+  "T_max_conductor_const_ambient_C": 42.700172688160805
+ },
+ "sensitivity_cable70_end_of_test": {
+  "base_C": 44.592629443593744,
+  "variants": [
+   [
+    "Eq. (25) as printed (\u03c1^0.25)",
+    0.4177148402786415,
+    3.669102832531773
+   ],
+   [
+    "\u03b1 = 0.00393 1/K (Cu @ 20 \u00b0C)",
+    -0.18967154181670054,
+    3.355829860871373
+   ],
+   [
+    "\u03c1_e = 1.7241e-8 \u03a9\u00b7m (IEC 60028)",
+    -1.6880306578369115,
+    2.5196891357370403
+   ],
+   [
+    "J over \u03c0 R_A\u00b2 (joule_area=geometric)",
+    -0.3092281498380416,
+    3.259780065999234
+   ],
+   [
+    "\u03b5 = 0.95",
+    -0.8465507049000109,
+    2.9369457374009187
+   ],
+   [
+    "\u03b5 = 0.75",
+    0.9188474754337577,
+    3.9635626096170116
+   ],
+   [
+    "Elevation H = 280 m (Terrassa)",
+    0.17741424463040545,
+    3.5241091812940613
+   ],
+   [
+    "XLPE & PVC density +20 %",
+    -0.14506125352242805,
+    3.2949127815174934
+   ],
+   [
+    "XLPE & PVC density \u221220 %",
+    0.14329115068581189,
+    3.561193120342911
+   ],
+   [
+    "Conductor mass = 8960\u00b7S_eff",
+    -0.09146218604877987,
+    3.3423570572516663
+   ],
+   [
+    "Constant properties @20 \u00b0C",
+    -0.01609380137760752,
+    3.4528805116973134
+   ],
+   [
+    "Radiation linearized (implicit)",
+    -0.009378109893454223,
+    3.417970189865356
+   ],
+   [
+    "Fig. 10b I\u00b2r level (joule \u00d70.90)",
+    -2.4784088279496572,
+    2.103185849206226
+   ]
+  ]
+ },
+ "bare_conductor_eq1_end_C": 48.59339497611214
+}

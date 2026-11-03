@@ -1,0 +1,7 @@
+{
+  "cable": "cable70",
+  "_comment": "70 mm2 cable: 3 h at 250 A, 30 min overload at 380 A, then 2 h at 150 A; ambient 25 degC then 35 degC after 2 h",
+  "current_steps": [[250, 10800], [380, 1800], [150, 7200]],
+  "ambient": [[25, 7200], [35, 12600]],
+  "model": {"nodes": 9, "dt": 10.0, "convection": "ieee738"}
+}

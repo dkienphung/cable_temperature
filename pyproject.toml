@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cable_thermal"
+version = "1.0.0"
+description = "Current-temperature model of insulated and jacketed cables (Riba & Llaurado, Materials 2022, 15, 6814)"
+requires-python = ">=3.9"
+dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
+
+[project.scripts]
+cable-thermal = "cable_thermal.__main__:main"
+
+[tool.setuptools]
+packages = ["cable_thermal", "cable_thermal.data"]
+
+[tool.setuptools.package-data]
+"cable_thermal.data" = ["*.json"]
