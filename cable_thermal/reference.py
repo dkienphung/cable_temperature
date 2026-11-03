@@ -22,15 +22,18 @@ from scipy.integrate import solve_ivp
 from scipy.sparse import diags
 
 from .cables import CableSpec
-from .heat_transfer import KELVIN, SIGMA, h_natural
+from .heat_transfer import KELVIN, SIGMA, h_surface
 from .model import StepProfile, as_function
 
 
 class ReferenceSolver:
-    def __init__(self, cable: CableSpec, n=(60, 60, 60), convection_model="ieee738", elevation=0.0):
+    def __init__(self, cable: CableSpec, n=(60, 60, 60), convection_model="ieee738", elevation=None,
+                 air_speed=0.0, air_flow_angle=90.0):
         self.cable = cable
         self.conv = convection_model
-        self.elev = elevation
+        self.elev = cable.elevation if elevation is None else elevation
+        self.air_speed = air_speed
+        self.air_flow_angle = air_flow_angle
         c = cable
         NA, NB, NC = n
         x = np.concatenate([np.linspace(0, c.R_A, NA + 1), np.linspace(c.R_A, c.R_B, NB + 1)[1:],
@@ -72,7 +75,7 @@ class ReferenceSolver:
         net += I**2 * c.resistance_per_length(T) * self.share
         Ta = Tafun(t)
         Ts = T[-1]
-        h = float(h_natural(Ts, Ta, c.outer_diameter, self.elev, self.conv))
+        h = float(h_surface(Ts, Ta, c.outer_diameter, self.elev, self.conv, self.air_speed, self.air_flow_angle))
         net[-1] -= h * self.p * (Ts - Ta) + c.emissivity * SIGMA * self.p * ((Ts + KELVIN) ** 4 - (Ta + KELVIN) ** 4)
         C = np.zeros(self.n)
         for m in range(3):

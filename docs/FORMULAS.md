@@ -49,7 +49,7 @@ Legend: ✅ correct · ⚠️ correct but ambiguous/incomplete · ❌ error.
 | Eq. | Content (as published) | Verdict | Correct form |
 |---|---|---|---|
 | 25 | `h = (3.645/π) ρ_air^0.25 D^−0.25 (T − T_air)^0.25` | ❌ | IEEE 738-2012 Eq. (5c): `q_cn = 3.645 ρ_f^0.5 D^0.75 (T_s−T_a)^1.25` [W/m]. Dividing by `πD(T_s−T_a)`: **`h = (3.645/π) ρ_f^0.5 D^−0.25 (T_s−T_a)^0.25`**. The exponent of ρ is 0.5, not 0.25. With ρ ≈ 1.18 kg/m³ the printed formula gives h about 4 % too low (70 mm² test: +0.42 K). Both versions are available (`--convection paper|ieee738`); the corrected one is the default. |
-| 26 | `ρ_air = (1.293 − 1.525·10⁻⁴H + 6.379·10⁻⁹H²) / (1 + 0.00367 (T_air+T)/2)` with "T_air (K) and T (K)" | ❌ units | The formula is IEEE 738-2012 Eq. (14a) and requires the **film temperature in °C** (0.00367 ≈ 1/272.5). Taken literally in kelvin it gives ρ ≈ 0.62 kg/m³ at 21 °C (instead of 1.20), i.e. h −28 %. Implemented in °C. The elevation H is not given in the paper (H = 0 used; 280 m → +0.18 K). |
+| 26 | `ρ_air = (1.293 − 1.525·10⁻⁴H + 6.379·10⁻⁹H²) / (1 + 0.00367 (T_air+T)/2)` with "T_air (K) and T (K)" | ❌ units | The formula is IEEE 738-2012 Eq. (14a) and requires the **film temperature in °C** (0.00367 ≈ 1/272.5). Taken literally in kelvin it gives ρ ≈ 0.62 kg/m³ at 21 °C (instead of 1.20), i.e. h −28 %. Implemented in °C. The elevation H is not given in the paper; the paper cables are preset to the Terrassa lab, H = 280 m (ρ −3.2 %, h −1.6 %; vs sea level +0.18 K on the 70 mm² test). |
 | – | ε = 0.85, σ | ✅ | σ = 5.670374419·10⁻⁸ W/(m²K⁴). |
 
 ## 5. Data (Tables 1–4) and internal consistency
@@ -71,10 +71,10 @@ Legend: ✅ correct · ⚠️ correct but ambiguous/incomplete · ❌ error.
 * **Numerics are not the issue.** The paper's scheme (9 nodes per material, Δt = 10 s) differs
   from an independent 121-node Radau solution by < 0.01 K for both tests.
 * **150 mm² cable (Fig. 11):** reproduced with the published data – mean error −0.4 K at the
-  conductor-insulation and insulation-jacket points (RMS 0.46 / 0.40 K, mean relative error
-  −1.5 %), jacket-air −1.0 K.
+  conductor-insulation and insulation-jacket points (RMS 0.45 / 0.39 K, mean relative error
+  −1.4 %), jacket-air −1.0 K. (All numbers with H = 280 m and still air.)
 * **70 mm² cable (Fig. 9):** **not reproduced** with the published data – the model is
-  +3.2 K (mean) / +5.3 K (end) hotter. No formula correction explains this (all corrections
+  +3.3 K (mean) / +5.5 K (end) hotter. No formula correction explains this (all corrections
   together < 1 K, Fig. 16). The early heating rate in Fig. 9 (≈ 2.5 K in the first 500 s with
   ≈ 3.5–3.8 W/m) requires about 2.3× the heat capacity per unit length obtainable from Table 1
   (368 J/(m·K)), and the late level about 1.3× the surface heat-transfer coefficient
@@ -91,5 +91,25 @@ Legend: ✅ correct · ⚠️ correct but ambiguous/incomplete · ❌ error.
 | Discrete energy balance Σ C_i ΔT_i/Δt = ΣI²r − P_c − P_r | 5·10⁻¹⁰ W/m |
 | Adiabatic short circuit vs IEC 60949 `I²t = K²S² ln((θf+β)/(θi+β))` | < 0.05 K (K = 226 recovered from σ_c = 3.45 MJ/(K·m³), β = 234.5 K) |
 | Non-adiabatic short circuit (70 mm², 9.3 kA, 1 s, from 90 °C) | model 233.8 °C vs IEC 60949 non-adiabatic factor 231.9 °C |
-| Steady-state ampacity at 90 °C | model 339 A vs IEC 60287 (same k) 354 A (70 mm²); 550 A vs 561 A (150 mm²) – IEC uses its empirical h = Z/De^g + E |
+| Steady-state ampacity at 90 °C | model 338 A vs IEC 60287 (same k) 354 A (70 mm²); 548 A vs 561 A (150 mm²) – IEC uses its empirical h = Z/De^g + E |
+| Forced convection (optional extension) | K_angle(90°) = 1, K_angle(0°) = 0.388, q = max(q_c1, q_c2) reproduced; air speed 0 gives bit-identical results to the paper model; the reference solver agrees within 0.05 K at 0.2 m/s |
+
+## 8. Optional extension: indoor air movement (not in the paper)
+
+The paper assumes still air (natural convection only, Eq. 25). For an indoor laboratory a slight
+air movement from ventilation is plausible, so an optional forced-convection term from the same
+standard the paper cites (IEEE Std 738-2012) is available:
+
+```
+q_c1 = K_angle [1.01 + 1.35 Re^0.52] k_f (Ts − Ta)        (3a)
+q_c2 = K_angle 0.754 Re^0.6 k_f (Ts − Ta)                 (3b)
+Re = D ρ_f V / μ_f ,  μ_f = 1.458·10⁻⁶ (T_film+273)^1.5 / (T_film+383.4)          (13a)
+k_f = 2.424·10⁻² + 7.477·10⁻⁵ T_film − 4.407·10⁻⁹ T_film²                         (15a)
+K_angle = 1.194 − cos φ + 0.194 cos 2φ + 0.368 sin 2φ                            (4a)
+h = max(q_cn, q_c1, q_c2) / (π D (Ts − Ta))        (IEEE 738: use the largest)
+```
+
+With a draught of about 0.18 m/s the 70 mm² test agrees with the paper (RMS 0.73 K instead of
+3.5 K), but the 150 mm² test agrees best at 0 m/s, so air movement alone does not explain the
+70 mm² discrepancy (see `results/RESULTS.md` §8 and `fig19`).
 | Long transient → steady state | identical to 1e-3 K |

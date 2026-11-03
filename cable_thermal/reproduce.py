@@ -428,7 +428,8 @@ def run_all(out="results", quick=False):
         ("J over π R_A² (joule_area=geometric)", CABLE_70, dict(joule_area="geometric")),
         ("ε = 0.95", CABLE_70.with_(emissivity=0.95), {}),
         ("ε = 0.75", CABLE_70.with_(emissivity=0.75), {}),
-        ("Elevation H = 280 m (Terrassa)", CABLE_70, dict(elevation=280.0)),
+        ("Elevation H = 0 m (sea level)", CABLE_70, dict(elevation=0.0)),
+        ("Indoor air speed 0.1 m/s", CABLE_70, dict(air_speed=0.1)),
         ("XLPE & PVC density +20 %", CABLE_70.with_(insulation_material=xlpe(920 * 1.2), jacket_material=pvc(1400 * 1.2)), {}),
         ("XLPE & PVC density −20 %", CABLE_70.with_(insulation_material=xlpe(920 * 0.8), jacket_material=pvc(1400 * 0.8)), {}),
         ("Conductor mass = 8960·S_eff", CABLE_70.with_(conductor_mass_per_length=8960 * 70e-6), {}),
@@ -472,6 +473,9 @@ def run_all(out="results", quick=False):
     plt.close(fig)
     summary["bare_conductor_eq1_end_C"] = float(Tb[-1])
 
+    # ---------------------------------------------------------------- lab environment: elevation + indoor air movement
+    summary["lab_environment"] = lab_environment_study(F("fig19_lab_environment_air_speed.png"))
+
     # ---------------------------------------------------------------- h vs ΔT (Eq. 25 printed vs corrected) and Eq. 26 units
     fig, ax = plt.subplots(figsize=(7, 4))
     dT = np.linspace(0.5, 60, 200)
@@ -498,6 +502,61 @@ def run_all(out="results", quick=False):
     return summary
 
 
+def lab_environment_study(path):
+    """Effect of the site elevation (Eq. 26) and of indoor air movement (IEEE 738 forced
+    convection, not part of the paper) on the two test sequences."""
+    from scipy.optimize import minimize_scalar
+
+    out = {}
+    speeds_plot = [0.0, 0.1, 0.2, 0.3]
+    speeds_scan = np.round(np.arange(0.0, 0.501, 0.025), 3)
+    fig, axs = plt.subplots(1, 3, figsize=(15, 4.6))
+    shades = [ORANGE, VIOLET, AQUA, BLUE]
+    for ax, cable, key in [(axs[0], CABLE_70, "fig9_cable70"), (axs[1], CABLE_150, "fig11_cable150")]:
+        d = _paper_curve(key, "conductor_insulation")
+        ax.plot(d[:, 0], d[:, 1], color=INK, ls=(0, (4, 2)), lw=1.4, label="Paper (digitized)")
+        res = {"elevation": {}, "air_speed": []}
+        for H in (0.0, cable.elevation):
+            r = CableThermalModel(cable, elevation=H).simulate(cable.test_steps)
+            res["elevation"][f"{H:g} m"] = {"end_C": float(r.T_conductor_insulation[-1]),
+                                            "rms_K": _rms_bias(r, key)["all"]["rms_K"]}
+        for v, col in zip(speeds_plot, shades):
+            r = CableThermalModel(cable, air_speed=v).simulate(cable.test_steps)
+            lab = "still air (paper)" if v == 0 else f"air speed {v:g} m/s"
+            ax.plot(r.t, r.T_conductor_insulation, color=col, label=f"Model, {lab}")
+        for v in speeds_scan:
+            r = CableThermalModel(cable, air_speed=float(v)).simulate(cable.test_steps)
+            sc = _rms_bias(r, key)
+            res["air_speed"].append({"V": float(v), "end_C": float(r.T_conductor_insulation[-1]),
+                                     "rms_K": sc["all"]["rms_K"], "mean_K": sc["all"]["mean_K"]})
+        best = minimize_scalar(lambda v: _rms_bias(CableThermalModel(cable, air_speed=v).simulate(cable.test_steps),
+                                                   key)["all"]["rms_K"], bounds=(0.0, 0.6), method="bounded",
+                               options={"xatol": 1e-3})
+        res["best_air_speed"] = {"V": float(best.x), "rms_K": float(best.fun)}
+        res["paper_end_C"] = float(d[-1, 1])
+        out[cable.name] = res
+        ax.set_xlabel("Time [s]")
+        ax.set_ylabel("Conductor-insulation temperature [°C]")
+        ax.set_title(f"{cable.name}: H = {cable.elevation:g} m, indoor air movement", loc="left", fontsize=10)
+        ax.legend(fontsize=7.5, loc="upper left")
+    ax = axs[2]
+    for cable, col in [(CABLE_70, ORANGE), (CABLE_150, BLUE)]:
+        a = out[cable.name]["air_speed"]
+        b = out[cable.name]["best_air_speed"]
+        ax.plot([x["V"] for x in a], [x["rms_K"] for x in a], "o-", ms=3.5, color=col,
+                label=f"{cable.name} (min {b['rms_K']:.2f} K at {b['V']:.2f} m/s)")
+        ax.plot([b["V"]], [b["rms_K"]], "o", ms=11, mfc="none", mec=col, mew=1.5)
+    ax.set_ylim(bottom=0.4)
+    ax.set_xlabel("Indoor air speed V [m/s] (perpendicular, IEEE 738)")
+    ax.set_ylabel("RMS difference to paper curves [K]")
+    ax.set_title("Agreement with the paper vs air speed", loc="left", fontsize=10)
+    ax.legend(fontsize=8)
+    fig.tight_layout()
+    fig.savefig(path)
+    plt.close(fig)
+    return out
+
+
 def write_results_md(s, path):
     c70, c150 = s["comparison_with_paper"]["cable70/ieee738"], s["comparison_with_paper"]["cable150/ieee738"]
     p70, p150 = s["comparison_with_paper"]["cable70/paper"], s["comparison_with_paper"]["cable150/paper"]
@@ -509,7 +568,8 @@ def write_results_md(s, path):
       "conductor-insulation and insulation-jacket traces the paper's measured and simulated curves overlap and "
       "the digitized trace is their median; the jacket-air trace is the measured one.\n")
     w("## 1. Test sequences of the paper (Figs. 9 and 11)\n")
-    w("Model = paper Eqs. (2)-(27) with the cable data of Tables 1-4, 9 nodes per material, Δt = 10 s.\n")
+    w("Model = paper Eqs. (2)-(27) with the cable data of Tables 1-4, 9 nodes per material, Δt = 10 s, "
+      "site elevation H = 280 m (Terrassa laboratory, Eq. 26), still air as assumed by the paper.\n")
     for name, c, p in [("70 mm² (Table 1/2, Fig. 9)", c70, p70), ("150 mm² (Table 3/4, Fig. 11)", c150, p150)]:
         w(f"### {name}\n")
         w("| Measuring point | paper end [°C] | model end, Eq. 25 corrected [°C] | model end, Eq. 25 as printed [°C] | mean error [K] | RMS error [K] | mean rel. error [%] |")
@@ -565,5 +625,25 @@ def write_results_md(s, path):
     w(f"Peak conductor-insulation temperature over 48 h: {s['dynamic']['T_max_conductor_C']:.1f} °C "
       f"(variable ambient) vs {s['dynamic']['T_max_conductor_const_ambient_C']:.1f} °C (constant 19 °C).\n")
     w(f"Bare conductor with lumped Eq. (1): {s['bare_conductor_eq1_end_C']:.2f} °C at 8600 s.\n")
+    le = s["lab_environment"]
+    w("## 8. Laboratory environment: elevation and indoor air movement\n")
+    w("The paper does not state the elevation (Eq. 26) and assumes still air. The paper cables are preset to the "
+      "Terrassa laboratory (H = 280 m). Optional indoor air movement uses IEEE 738-2012 forced convection "
+      "(largest of natural, q_c1, q_c2). Conductor-insulation temperature at the end of each test:\n")
+    w("| Case | 70 mm² end [°C] | 70 mm² RMS [K] | 150 mm² end [°C] | 150 mm² RMS [K] |")
+    w("|---|---|---|---|---|")
+    a, b = le["cable70"], le["cable150"]
+    w(f"| Paper | {a['paper_end_C']:.2f} | - | {b['paper_end_C']:.2f} | - |")
+    for H in a["elevation"]:
+        w(f"| H = {H}, still air | {a['elevation'][H]['end_C']:.2f} | {a['elevation'][H]['rms_K']:.2f} | "
+          f"{b['elevation'][H]['end_C']:.2f} | {b['elevation'][H]['rms_K']:.2f} |")
+    for x, y in zip(a["air_speed"], b["air_speed"]):
+        if x["V"] in (0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5):
+            w(f"| H = 280 m, V = {x['V']:g} m/s | {x['end_C']:.2f} | {x['rms_K']:.2f} | {y['end_C']:.2f} | {y['rms_K']:.2f} |")
+    w("")
+    w(f"Best-fitting air speed: 70 mm² {a['best_air_speed']['V']:.2f} m/s (RMS {a['best_air_speed']['rms_K']:.2f} K), "
+      f"150 mm² {b['best_air_speed']['V']:.2f} m/s (RMS {b['best_air_speed']['rms_K']:.2f} K). "
+      "The elevation changes the results by only ~0.2 K; a gentle draught of ~0.2 m/s reconciles the 70 mm² test "
+      "but makes the 150 mm² test worse, so a single air speed does not explain both tests.\n")
     with open(path, "w") as fh:
         fh.write("\n".join(L))

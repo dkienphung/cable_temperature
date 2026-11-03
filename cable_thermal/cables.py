@@ -30,6 +30,7 @@ class CableSpec:
     jacket_material: Material = field(default_factory=pvc)
     emissivity: float = 0.85           # paper, Section 2.4
     ambient_temperature: float = 20.0  # [°C]
+    elevation: float = 0.0             # site elevation H [m] used in Eq. (26)
     test_steps: Tuple[Tuple[float, float], ...] = ()   # ((I_rms [A], duration [s]), ...)
     max_continuous_temperature: float = 90.0
     short_circuit_temperature: float = 250.0
@@ -94,8 +95,13 @@ class CableSpec:
             "insulation": self.insulation_material.name,
             "jacket": self.jacket_material.name,
             "ambient_C": self.ambient_temperature,
+            "elevation_m": self.elevation,
         }
 
+
+# Site of the paper's tests: AMBER high-current laboratory, UPC, Terrassa (Spain).
+# The paper does not give H; Terrassa lies at about 280 m above sea level.
+PAPER_LAB_ELEVATION = 280.0
 
 # ---------------------------------------------------------------------------
 # Table 1 / Table 2 : Barrinax U-1000 R2V 1x70 mm² (XLPE / PVC)
@@ -111,10 +117,12 @@ CABLE_70 = CableSpec(
     alpha=0.0043,
     conductor_mass_per_length=0.584,
     ambient_temperature=19.0,
+    elevation=PAPER_LAB_ELEVATION,
     test_steps=((120, 1950), (145, 1950), (170, 1500), (185, 1850), (212, 1350)),
     notes=(
         "All values from paper Table 1 and Table 2.",
         "XLPE and PVC densities are not given in the paper (assumed 920 / 1400 kg/m3).",
+        "Site elevation 280 m (Terrassa laboratory) assumed - not stated in the paper.",
     ),
 )
 
@@ -132,6 +140,7 @@ CABLE_150 = CableSpec(
     alpha=0.0043,                 # not in Table 3 - same value as Table 1 assumed
     conductor_mass_per_length=1.74,
     ambient_temperature=23.5,
+    elevation=PAPER_LAB_ELEVATION,
     test_steps=((130, 766), (163, 554), (220, 850), (305, 530), (405, 400)),
     notes=(
         "Values from paper Table 3 and Table 4.",

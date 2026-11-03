@@ -8,6 +8,8 @@ python -m cable_thermal simulate --cable cable70 --steps 150:3600,250:1800 --amb
 python -m cable_thermal simulate --config examples/overload.json
 python -m cable_thermal steady --cable cable150 --current 400 --ambient 30
 python -m cable_thermal ampacity --cable cable70 --tmax 90 --ambient 30
+python -m cable_thermal simulate --cable cable70 --air-speed 0.2              # indoor draught 0.2 m/s
+python -m cable_thermal ampacity --cable cable70 --elevation 0 --air-speed 0.5 --air-angle 45
 """
 from __future__ import annotations
 
@@ -24,7 +26,7 @@ from .model import CableThermalModel, ModelOptions
 def _model(args, cable=None):
     cable = cable or get_cable(args.cable)
     opts = ModelOptions(nodes_per_material=tuple([args.nodes] * 3), dt=args.dt, convection_model=args.convection,
-                        elevation=args.elevation)
+                        elevation=args.elevation, air_speed=args.air_speed, air_flow_angle=args.air_angle)
     return CableThermalModel(cable, opts)
 
 
@@ -56,7 +58,7 @@ def cmd_simulate(args):
         current = _parse_steps(args.steps)
     m = _model(args, cable)
     r = m.simulate(current, ambient=ambient, t_end=t_end)
-    print(f"cable: {cable.designation}")
+    print(f"cable: {cable.designation} | H = {m.elevation:g} m, air speed = {m.opt.air_speed:g} m/s")
     print(f"{'t [s]':>8} {'I [A]':>7} {'T_air':>6} {'T_centre':>9} {'T_c-ins':>8} {'T_ins-jac':>9} {'T_jac-air':>9}")
     step = max(1, len(r.t) // 20)
     for j in sorted(set(range(0, len(r.t), step)) | {len(r.t) - 1}):
@@ -88,7 +90,8 @@ def cmd_steady(args):
     m = _model(args)
     res = m.steady_heat_terms(args.current, args.ambient)
     T = res["T"]
-    print(f"I = {args.current:g} A, T_air = {args.ambient if args.ambient is not None else m.cable.ambient_temperature:g} °C")
+    print(f"I = {args.current:g} A, T_air = {args.ambient if args.ambient is not None else m.cable.ambient_temperature:g} °C, "
+          f"H = {m.elevation:g} m, air speed = {m.opt.air_speed:g} m/s")
     for k, i in m.probes.items():
         print(f"  {k:22s} {T[i]:8.2f} °C")
     print(f"  Joule {res['joule']:.3f} W/m = convection {res['p_conv']:.3f} + radiation {res['p_rad']:.3f} W/m "
@@ -119,7 +122,12 @@ def main(argv=None):
         sp.add_argument("--dt", type=float, default=10.0, help="time step [s] (paper: 10)")
         sp.add_argument("--convection", default="ieee738", choices=["ieee738", "paper"],
                         help="ieee738 = corrected Eq. 25 (rho^0.5); paper = Eq. 25 as printed (rho^0.25)")
-        sp.add_argument("--elevation", type=float, default=0.0, help="H in Eq. 26 [m]")
+        sp.add_argument("--elevation", type=float, default=None,
+                        help="site elevation H in Eq. 26 [m] (default: cable preset, 280 m for the paper's lab)")
+        sp.add_argument("--air-speed", dest="air_speed", type=float, default=0.0,
+                        help="indoor air speed [m/s]; 0 = still air as in the paper, >0 adds IEEE 738 forced convection")
+        sp.add_argument("--air-angle", dest="air_angle", type=float, default=90.0,
+                        help="angle between air flow and cable axis [deg] (default 90 = perpendicular)")
 
     s = sub.add_parser("simulate", help="transient / dynamic simulation")
     common(s)

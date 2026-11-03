@@ -54,8 +54,16 @@ python -m cable_thermal ampacity --cable cable70 --tmax 90 --ambient 30
 python -m pytest -q
 ```
 
-Options: `--nodes` (nodes per material), `--dt`, `--convection ieee738|paper` (corrected vs printed
-Eq. 25), and `--elevation` (H in Eq. 26).
+Options:
+* `--nodes`: nodes per material.
+* `--dt`: time step.
+* `--convection ieee738|paper`: corrected vs printed Eq. 25.
+* `--elevation`: H in Eq. 26. The default is the cable preset; the paper's two cables are preset
+  to 280 m, the Terrassa lab.
+* `--air-speed` / `--air-angle`: indoor air movement, see below.
+
+A JSON scenario file can set the same options under `"model"`: `elevation`, `air_speed`,
+`air_angle`, `nodes`, `dt` and `convection`.
 
 From Python:
 
@@ -65,6 +73,7 @@ m = CableThermalModel(CABLE_70)                      # Table 1 data, 9 nodes/mat
 r = m.simulate(CABLE_70.test_steps)                  # Table 2 current steps
 r.T_conductor_insulation, r.T_insulation_jacket, r.T_jacket_air, r.joule, r.p_conv, r.p_rad
 m.steady_state(212.0); m.ampacity(90.0)
+CableThermalModel(CABLE_70, air_speed=0.2, elevation=0.0)   # draught of 0.2 m/s, sea level
 m.simulate(lambda t: 9270 if t < 1 else 339, t_end=60, dt=0.005, T_init=m.steady_state(339))  # short circuit
 ```
 
@@ -99,23 +108,44 @@ m.simulate(lambda t: 9270 if t < 1 else 339, t_end=60, dt=0.005, T_init=m.steady
 | `fig16_sensitivity.png` | Sensitivity to formula choices and missing data |
 | `fig17_bare_conductor_eq1.png` | Insulated cable vs bare-conductor Eq. 1 |
 | `fig18_heat_transfer_coefficients.png` | h from Eq. 25 printed/corrected, Eq. 26 in K, radiation |
+| `fig19_lab_environment_air_speed.png` | Lab elevation and indoor air movement vs the paper curves |
 
 Main numbers:
 
+All results use the Terrassa lab elevation (280 m) and still air, as in the paper.
+
 * **150 mm² (Fig. 11)** is reproduced from the published data. At the end of the test the model
-  gives 38.7 / 37.2 / 34.5 °C against the paper's 39.5 / 37.9 / 37.0 °C. Mean error is −0.4 K
+  gives 38.7 / 37.3 / 34.5 °C against the paper's 39.5 / 37.9 / 37.0 °C. Mean error is −0.4 K
   at the conductor.
 * **70 mm² (Fig. 9)** is not reproduced from the published data. The model ends at
-  44.6 / 43.3 / 39.9 °C against the paper's 39.3 / 37.5 / 35.2 °C. None of the formula
+  44.8 / 43.5 / 40.1 °C against the paper's 39.3 / 37.5 / 35.2 °C. None of the formula
   corrections explains the gap, and the numerics are exact to 0.01 K. An inverse fit needs about
   2.3× the heat capacity in Table 1 and 1.3× the heat-transfer coefficient, which points to
   different inputs behind the published simulation (see FORMULAS.md §6).
 * Over the 20–75 °C range of the tests, using temperature-dependent properties instead of
   constant ones (at 20 °C) changes the result by only −0.02 K.
-* Ampacity at 90 °C: 339 A for 70 mm² at 19 °C (IEC 60287 with the same k: 354 A) and 550 A
+* Ampacity at 90 °C: 338 A for 70 mm² at 19 °C (IEC 60287 with the same k: 354 A) and 548 A
   for 150 mm² at 23.5 °C (IEC 60287: 561 A).
 * Short circuit, 70 mm², 9.27 kA for 1 s from 90 °C: peak 233.8 °C. IEC 60949 gives 250 °C
   adiabatic and 231.9 °C non-adiabatic. The paper's Δt = 10 s cannot resolve this case.
+
+## Laboratory environment: elevation and indoor air movement
+
+The paper does not state the elevation of its lab and assumes still air. Two options cover this:
+
+* **Site elevation** (`CableSpec.elevation`, `--elevation`) enters the air density of Eq. 26.
+  The paper's cables are preset to 280 m (UPC Terrassa). Compared with sea level this changes
+  the results by only about +0.2 K, because thinner air cools slightly less.
+* **Indoor air speed** (`ModelOptions.air_speed`, `--air-speed`, `--air-angle`) is not part of the
+  paper. It adds IEEE 738-2012 forced convection (Eqs. 3a/3b, with the air properties of
+  Eqs. 13a/15a and the direction factor of Eq. 4a). As IEEE 738 prescribes, the larger of the
+  natural and forced losses is used, so `air_speed = 0` reproduces the paper exactly.
+
+Results (`fig19`, RESULTS.md §8): a gentle draught of about 0.18 m/s brings the 70 mm² test from
+3.5 K RMS down to 0.7 K RMS against the paper (end 39.2 °C vs 39.3 °C). The same draught makes
+the 150 mm² test worse, and that test fits best at 0 m/s, so a single air speed cannot explain
+both tests. The too-fast early heating of the 70 mm² cable, which is driven by heat capacity, is
+also not affected by air movement.
 
 ## Repository layout
 

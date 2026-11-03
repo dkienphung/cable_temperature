@@ -37,7 +37,7 @@ from typing import Callable, Optional, Sequence, Tuple, Union
 import numpy as np
 
 from .cables import CableSpec
-from .heat_transfer import KELVIN, SIGMA, h_natural
+from .heat_transfer import KELVIN, SIGMA, h_natural, h_surface
 
 Number = Union[int, float]
 
@@ -107,7 +107,9 @@ class ModelOptions:
     nodes_per_material: Tuple[int, int, int] = (9, 9, 9)   # paper: nine nodes per material
     dt: float = 10.0                                       # paper: 10 s
     convection_model: str = "ieee738"   # 'ieee738' (corrected Eq. 25) or 'paper' (as printed)
-    elevation: float = 0.0              # H in Eq. (26) [m] (not given in the paper)
+    elevation: Optional[float] = None   # H in Eq. (26) [m]; None -> cable.elevation (site preset)
+    air_speed: float = 0.0              # indoor air speed [m/s]; 0 = still air (paper). >0 -> IEEE 738 forced conv.
+    air_flow_angle: float = 90.0        # angle between air flow and cable axis [deg] (IEEE 738 K_angle)
     joule_area: str = "effective"       # 'effective' -> r = rho/S_eff ; 'geometric' -> rho/(pi R_A^2)
     radiation: str = "explicit"         # 'explicit' (paper Eq. 23) or 'linearized' (Newton, implicit)
     face_k: str = "mean"                # k on a face evaluated at mean of the 2 nodes ('mean') or upwind node ('left')
@@ -252,8 +254,13 @@ class CableThermalModel:
     def surface_h(self, Ts, Tair):
         if self.opt.convection_off or self.opt.adiabatic:
             return 0.0
-        return self.opt.h_scale * float(h_natural(Ts, Tair, self.cable.outer_diameter, self.opt.elevation,
-                                                  self.opt.convection_model))
+        return self.opt.h_scale * float(h_surface(Ts, Tair, self.cable.outer_diameter, self.elevation,
+                                                  self.opt.convection_model, self.opt.air_speed,
+                                                  self.opt.air_flow_angle))
+
+    @property
+    def elevation(self) -> float:
+        return self.cable.elevation if self.opt.elevation is None else float(self.opt.elevation)
 
     def surface_radiation(self, Ts, Tair):
         if self.opt.radiation_off or self.opt.adiabatic:
@@ -402,7 +409,7 @@ class CableThermalModel:
 
 
 def simulate_bare_conductor_eq1(cable: CableSpec, current, ambient=None, t_end=None, dt=1.0,
-                                convection_model="ieee738", elevation=0.0):
+                                convection_model="ieee738", elevation=None, air_speed=0.0, air_flow_angle=90.0):
     """Paper Eq. (1) (CIGRE/IEEE 738 lumped heat balance of a BARE conductor) with
     Eq. (2) resistance, solved with explicit Euler. Used only for comparison."""
     Ifun = as_function(current)
@@ -410,6 +417,7 @@ def simulate_bare_conductor_eq1(cable: CableSpec, current, ambient=None, t_end=N
     if t_end is None:
         t_end = Ifun.total_duration
     D = cable.conductor_diameter
+    elevation = cable.elevation if elevation is None else elevation
     m = cable.conductor_mass
     cp = cable.conductor_material.cp
     n = int(round(t_end / dt))
@@ -419,7 +427,7 @@ def simulate_bare_conductor_eq1(cable: CableSpec, current, ambient=None, t_end=N
         tj = j * dt
         Ta = Tafun(tj)
         Pj = Ifun(tj + 0.5 * dt) ** 2 * cable.resistance_per_length(T[j])
-        h = h_natural(T[j], Ta, D, elevation, convection_model)
+        h = h_surface(T[j], Ta, D, elevation, convection_model, air_speed, air_flow_angle)
         Pc = h * np.pi * D * (T[j] - Ta)
         Pr = cable.emissivity * SIGMA * np.pi * D * ((T[j] + KELVIN) ** 4 - (Ta + KELVIN) ** 4)
         T[j + 1] = T[j] + dt * (Pj - Pc - Pr) / (m * cp(T[j]))

@@ -173,3 +173,60 @@ def test_digitized_properties_are_plausible():
     assert 398 < digitized("copper_k")(20) < 399.5
     assert 0.31 < digitized("xlpe_k")(60) < 0.32
     assert 0.11 < digitized("pvc_k")(75) < 0.12
+
+
+# ---------------------------------------------------------------- site elevation and indoor air movement
+from cable_thermal.heat_transfer import (air_conductivity_ieee738, air_viscosity_ieee738, h_surface,
+                                         q_forced_ieee738, reynolds_ieee738, wind_direction_factor)
+from cable_thermal.model import ModelOptions
+
+
+def test_paper_cables_use_lab_elevation_and_override():
+    assert CABLE_70.elevation == CABLE_150.elevation == 280.0
+    assert CableThermalModel(CABLE_70).elevation == 280.0
+    assert CableThermalModel(CABLE_70, ModelOptions(elevation=0.0)).elevation == 0.0
+    # Eq. (26): density at 280 m is lower than at sea level by the IEEE 738 polynomial ratio
+    ratio = air_density_ieee738(30, 20, 280.0) / air_density_ieee738(30, 20, 0.0)
+    assert np.isclose(ratio, (1.293 - 1.525e-4 * 280 + 6.379e-9 * 280 ** 2) / 1.293)
+    hot_280 = CableThermalModel(CABLE_70).steady_state(212.0)[0]
+    hot_0 = CableThermalModel(CABLE_70, elevation=0.0).steady_state(212.0)[0]
+    assert 0.0 < hot_280 - hot_0 < 0.5          # thinner air -> slightly hotter
+
+
+def test_ieee738_forced_convection_formulas():
+    assert np.isclose(wind_direction_factor(90.0), 1.0)
+    assert np.isclose(wind_direction_factor(0.0), 0.388)
+    assert np.isclose(air_viscosity_ieee738(20.0), 1.458e-6 * 293 ** 1.5 / 403.4)
+    assert 0.0255 < air_conductivity_ieee738(20.0) < 0.0260
+    D, Ts, Ta, V = 0.0147, 40.0, 19.0, 0.5
+    Re = reynolds_ieee738(Ts, Ta, D, V)
+    kf = air_conductivity_ieee738(0.5 * (Ts + Ta))
+    qc1 = (1.01 + 1.35 * Re ** 0.52) * kf * (Ts - Ta)
+    qc2 = 0.754 * Re ** 0.6 * kf * (Ts - Ta)
+    assert np.isclose(q_forced_ieee738(Ts, Ta, D, V), max(qc1, qc2))
+    # h_surface = largest of natural and forced convection (IEEE 738)
+    h = h_surface(Ts, Ta, D, air_speed=V)
+    assert np.isclose(h, max(h_natural(Ts, Ta, D), max(qc1, qc2) / (np.pi * D * (Ts - Ta))))
+
+
+def test_zero_air_speed_is_the_paper_still_air_model():
+    D = CABLE_70.outer_diameter
+    for Ts in (19.5, 30.0, 60.0):
+        assert h_surface(Ts, 19.0, D, 280.0, air_speed=0.0) == h_natural(Ts, 19.0, D, 280.0)
+    r0 = CableThermalModel(CABLE_70).simulate(CABLE_70.test_steps)
+    r1 = CableThermalModel(CABLE_70, air_speed=0.0).simulate(CABLE_70.test_steps)
+    assert np.array_equal(r0.T, r1.T)
+
+
+def test_air_movement_cools_and_is_conservative():
+    ends = [CableThermalModel(CABLE_70, air_speed=v).simulate(CABLE_70.test_steps) for v in (0.0, 0.2, 1.0)]
+    T_end = [r.T_conductor_insulation[-1] for r in ends]
+    assert T_end[0] > T_end[1] > T_end[2]
+    assert all(r.energy_balance_error() < 1e-8 for r in ends)
+
+
+def test_reference_solver_with_air_speed():
+    ref = ReferenceSolver(CABLE_70, n=(30, 30, 30), air_speed=0.2)
+    t, T = ref.simulate(CABLE_70.test_steps)
+    r = CableThermalModel(CABLE_70, air_speed=0.2).simulate(CABLE_70.test_steps)
+    assert np.max(np.abs(np.interp(t, r.t, r.T_conductor_insulation) - T[:, ref.probes["conductor_insulation"]])) < 0.05
