@@ -17,6 +17,7 @@ AMBIENT = 30;                    % degC
 CONV = 'churchill_chu';          % natural convection for thin wires ('ieee738' = paper Eq. 25)
 DO_TAU = ~ct_is_octave();        % thermal time constants (slow in Octave)
 SUBSET = [];                     % [] = all parts, or e.g. {'3051','391000'}
+REUSE = true;                    % reuse results/wires/campaign.mat if it exists (delete it to recompute)
 
 %% 1. Campaign over the whole database
 parts = ct_alpha_parts();
@@ -26,6 +27,12 @@ hdr = {'part', 'family', 'awg', 'insulation', 'group', 'T_max_C', 'D_cond_mm', '
 rows = cell(numel(parts), numel(hdr));
 W = cell(1, numel(parts)); res = nan(numel(parts), 5);
 t0 = tic;
+cache = fullfile(out, 'campaign.mat');
+if REUSE && exist(cache, 'file') && isempty(SUBSET)
+    S = load(cache); rows = S.rows; res = S.res; W = S.W;
+    fprintf('campaign results loaded from %s\n', cache);
+    parts = {};
+end
 for i = 1:numel(parts)
     w = ct_wire_from_alpha(parts{i}); W{i} = w;
     if ~isempty(SUBSET) && ~any(strcmpi(SUBSET, w.part_number)), continue; end
@@ -48,6 +55,7 @@ for i = 1:numel(parts)
     if mod(i, 25) == 0, fprintf('%d / %d parts (%.0f s)\n', i, numel(parts), toc(t0)); end
 end
 keep = ~cellfun(@isempty, rows(:, 1));
+if ~isempty(parts) && isempty(SUBSET), save('-v7', cache, 'rows', 'res', 'W'); end
 ct_write_csv(fullfile(out, 'wire_results_matlab.csv'), hdr, rows(keep, :));
 fprintf('campaign done: %d parts in %.0f s\n', sum(keep), toc(t0));
 
@@ -133,10 +141,10 @@ fprintf('%s\n', L{:});
 
 f = ct_figure(12, 5);
 subplot(1, 2, 1); hold on; box on; grid on;
-loglog(H(:, 1), H(:, 4), 'o', 'color', P.violet, 'markerfacecolor', P.violet, 'displayname', 'Habia PTFE (200 / 40)');
+loglog(H(:, 1), H(:, 4), 'o', 'color', P.violet, 'markerfacecolor', P.violet, 'displayname', ct_lbl(['Habia PTFE (200 ' deg 'C @ 40 ' deg 'C)']));
 loglog(RS(:, 1), RS(:, 4), 's', 'color', P.aqua, 'markerfacecolor', P.aqua, 'displayname', 'RS PRO PTFE (40 K rise)');
-loglog(PV(:, 1), PV(:, 3), 'd', 'color', P.yellow, 'markerfacecolor', P.yellow, 'displayname', 'Alpha PV (90 / 30)');
-loglog(SV(:, 1), SV(:, 4), '^', 'color', P.grey, 'markerfacecolor', P.grey, 'displayname', 'Super Vu-Tron (90 / 30)');
+loglog(PV(:, 1), PV(:, 3), 'd', 'color', P.yellow, 'markerfacecolor', P.yellow, 'displayname', ct_lbl(['Alpha PV (90 ' deg 'C @ 30 ' deg 'C)']));
+loglog(SV(:, 1), SV(:, 4), '^', 'color', P.grey, 'markerfacecolor', P.grey, 'displayname', ct_lbl(['Super Vu-Tron (90 ' deg 'C @ 30 ' deg 'C)']));
 loglog([1.5 600], [1.5 600], 'k-', 'displayname', 'model = rating');
 set(gca, 'xscale', 'log', 'yscale', 'log'); xlim([1.5 600]); ylim([1.5 600]);
 xlabel('Manufacturer current rating [A]'); ylabel('Model current, same criterion [A]'); ct_legend('northwest');
@@ -144,18 +152,18 @@ title('Model (Churchill-Chu) vs manufacturer ratings');
 subplot(1, 2, 2); hold on; box on; grid on;
 plot(1:size(H, 1), H(:, 2), 'o-', 'color', P.violet, 'markerfacecolor', P.violet, 'displayname', 'Churchill-Chu');
 plot(1:size(H, 1), H(:, 3), 'o--', 'color', P.violet, 'displayname', 'Eq. 25 (paper)');
-plot([1 size(H, 1)], [200 200], '-', 'color', P.red, 'displayname', 'PTFE rating 200');
+plot([1 size(H, 1)], [200 200], '-', 'color', P.red, 'displayname', ct_lbl(['PTFE rating 200 ' deg 'C']));
 set(gca, 'xtick', 1:size(H, 1), 'xticklabel', cellfun(@(r) strrep(r.type, 'E ', ''), hrows, 'uniformoutput', false), 'fontsize', 7);
 xlabel('Habia type E'); ylabel(ct_lbl(['Model conductor temperature at rating [' deg 'C]'])); ct_legend('southeast');
-title('Habia PTFE: temperature at the published current, 40 air');
+title(ct_lbl(['Habia PTFE: temperature at the published current, 40 ' deg 'C air']));
 ct_save_fig(f, fullfile(out, 'fig23_model_vs_manufacturer_ratings.png'));
 
 f = ct_figure(7, 4.4); hold on; box on; grid on;
 plot(Tamb, pub, 's-', 'color', P.ink, 'markerfacecolor', P.ink, 'displayname', 'Habia published');
 dcol = {P.violet, P.aqua, P.orange};
 for k = 1:3, plot(Tamb, der(k, :), 'o--', 'color', dcol{k}, 'displayname', ['model ' types{k}]); end
-xlabel(ct_lbl(['Ambient air temperature [' deg 'C]'])); ylabel('Current correction factor (40 = 1)'); ct_legend('southwest');
-title('Ambient correction: model (200 conductor) vs Habia');
+xlabel(ct_lbl(['Ambient air temperature [' deg 'C]'])); ylabel(ct_lbl(['Current correction factor (40 ' deg 'C = 1)'])); ct_legend('southwest');
+title(ct_lbl(['Ambient correction: model (200 ' deg 'C conductor) vs Habia']));
 ct_save_fig(f, fullfile(out, 'fig24_habia_ambient_correction.png'));
 
 %% 4. Same 22 AWG conductor, different insulation: 8 A step in 30 degC still air

@@ -69,7 +69,7 @@ for ic = 1:2
         Tm = interp1(r.t, ct_probe(r, probes{k}), Pk(:, 1));
         plot(Pk(:, 1), 100 * (Pk(:, 2) - Tm) ./ Pk(:, 2), '-', 'color', pcol{k}, 'linewidth', 1.3, 'displayname', plabel{k});
     end
-    plot([0 r.t(end)], [0 0], 'k-'); xlim([0 r.t(end)]);
+    plot([0 r.t(end)], [0 0], 'k-', 'handlevisibility', 'off'); xlim([0 r.t(end)]);
     xlabel('Time [s]'); ylabel('(paper - model)/paper [%]'); ct_legend('southwest'); set(gca, 'fontsize', 9);
     ct_save_fig(f, fullfile(out, figname{ic}));
 end
@@ -88,7 +88,7 @@ for t = 0:1000:8000
     text(jl, r.T(j, jl) + 0.3, sprintf('t = %d s', t), 'fontsize', 8);
 end
 yl = ylim;
-plot([NA + 1 NA + 1], yl, ':', 'color', P.ink2); plot([NA + NB + 1 NA + NB + 1], yl, ':', 'color', P.ink2);
+plot([NA + 1 NA + 1], yl, ':', 'color', P.ink2, 'handlevisibility', 'off'); plot([NA + NB + 1 NA + NB + 1], yl, ':', 'color', P.ink2, 'handlevisibility', 'off');
 text(NA / 2, yl(2), 'CONDUCTOR', 'verticalalignment', 'top', 'horizontalalignment', 'center');
 text(NA + 1 + NB / 2, yl(2), 'INSULATION', 'verticalalignment', 'top', 'horizontalalignment', 'center');
 text(NA + NB + 1 + (m.n - NA - NB - 1) / 2, yl(2), 'JACKET', 'verticalalignment', 'top', 'horizontalalignment', 'center');
@@ -148,10 +148,10 @@ for ic = 1:2
     plot(I, Ts, '-', 'color', P.grey, 'linewidth', 1.8, 'displayname', 'Jacket surface (model)');
     plot(Iiec, Ti, '--', 'color', P.violet, 'linewidth', 1.5, 'displayname', 'IEC 60287 (k from paper curves)');
     plot(Iiec2, Ti, ':', 'color', P.aqua, 'linewidth', 1.8, 'displayname', 'IEC 60287 (IEC \rho_T)');
-    plot([0 I(end)], [90 90], '-', 'color', P.red);
-    text(Imax, 93, sprintf('%.0f A @ 90', Imax), 'horizontalalignment', 'right', 'fontsize', 8);
+    plot([0 I(end)], [90 90], '-', 'color', P.red, 'handlevisibility', 'off');
+    text(Imax, 93, ct_lbl(sprintf(['%.0f A @ 90 ' char(176) 'C'], Imax)), 'horizontalalignment', 'right', 'fontsize', 8);
     xlabel('Current [A rms]'); ylabel(ct_lbl(['Temperature [' deg 'C]']));
-    title(sprintf('%s: steady current-temperature, T_{air} = %g', c.name, Ta)); ct_legend('northwest');
+    title(ct_lbl(sprintf(['%s: steady current-temperature, T_{air} = %g ' char(176) 'C'], c.name, Ta))); ct_legend('northwest');
 end
 ct_save_fig(f, fullfile(out, 'fig13_steady_state_current_temperature.png'));
 
@@ -183,7 +183,7 @@ plot(tt, T_ad, '--', 'color', P.violet, 'linewidth', 1.6, 'displayname', 'IEC 60
 plot(tsc, T_na, 'd', 'color', P.aqua, 'markerfacecolor', P.aqua, 'markersize', 8, 'displayname', 'IEC 60949 non-adiabatic');
 plot(r10.t, ct_probe(r10, 'conductor_insulation'), 's', 'color', P.red, 'markerfacecolor', P.red, 'displayname', 'paper time step dt = 10 s');
 xlim([0 20]); xlabel('Time [s]'); ylabel(ct_lbl(['Temperature [' deg 'C]'])); ct_legend('east');
-title(sprintf('70 mm2: %.2f kA, %g s short circuit from %.0f', Isc / 1e3, tsc, T0(1)));
+title(ct_lbl(sprintf(['70 mm2: %.2f kA, %g s short circuit from %.0f ' char(176) 'C'], Isc / 1e3, tsc, T0(1))));
 ct_save_fig(f, fullfile(out, 'fig14_short_circuit.png'));
 
 %% 5. Laboratory environment: indoor air movement (IEEE 738 forced convection), H = 280 m
