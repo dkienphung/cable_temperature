@@ -13,7 +13,8 @@ dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
 cable-thermal = "cable_thermal.__main__:main"
 
 [tool.setuptools]
-packages = ["cable_thermal", "cable_thermal.data"]
+packages = ["cable_thermal", "cable_thermal.data", "cable_thermal.data.wires"]
 
 [tool.setuptools.package-data]
 "cable_thermal.data" = ["*.json"]
+"cable_thermal.data.wires" = ["*.json"]

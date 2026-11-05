@@ -1,0 +1,48 @@
+{
+ "_about": "Thermal properties of wire insulation materials used by cable_thermal.wires. k = thermal conductivity [W/(m K)], density [kg/m3], cp = specific heat [J/(kg K)]. Constant (room-temperature) values unless model = paper_curves. Steady-state ampacity depends on k only; density and cp only affect transients. Retrieved 2026-11-05.",
+ "_sources": {
+  "paper": "Riba & Llaurado, Materials 2022, 15, 6814, Figs. 2-3 (digitized curves, 20-75 degC)",
+  "fluorotherm": "Fluorotherm, 'All Material Comparison - Typical Properties of Fluoropolymers', https://www.fluorotherm.com/technical-information/materials-overview/material-comparison/ (specific gravity ASTM D792, thermal conductivity)",
+  "fluororesin_table": "'Table 4.15 Fluororesin characteristics list (representative values)', JIS/ISO/ASTM methods, https://cdn.toxicdocs.org/Jr/JroRLGB0ekO497EBkRmM6erQ6/JroRLGB0ekO497EBkRmM6erQ6.pdf (specific heat JIS K 7123, density, conductivity)",
+  "arkema_kynar740": "Arkema, KYNAR 740 technical data sheet, https://hpp.arkema.com/assets/arkema/TDS_KYNAR%C2%AE%20740_en_WW.pdf (k 0.17-0.19 W/m-K ASTM D433, density 1.77-1.79 g/cm3)",
+  "shinetsu": "Shin-Etsu, 'Characteristic properties of silicone rubber compounds', https://www.shinetsusilicone-global.com/catalog/pdf/rubber_e.pdf ('thermal conductivity of silicone rubber is about 0.2 W/m K')",
+  "momentive_rtv615": "Momentive RTV615 data sheet, https://static.datasheets.com/doc/2413966-momentive-performance-materials-rtv615-010-ds.pdf (specific heat 0.3 cal/g degC = 1256 J/kg K; k 0.00045 cal/s cm degC = 0.19 W/m K)",
+  "tym_silicone": "TYM Seals & Gaskets, silicone rubber sheet data sheet, https://cdn.shopify.com/s/files/1/1087/2094/files/Silicone_Rubber_Sheet_Data_Sheet.pdf (density SG 1.2, k 0.24)",
+  "sabic_noryl_v0150b": "SABIC NORYL V0150B (PPE+HIPS) data sheet, https://static.datasheets.com/doc/17156510-saudi-basic-industries-v0150b-ds.pdf (k 0.27 W/m-degC ISO 8302, specific gravity 1.11)",
+  "ensinger_tecanyl_gf30": "Ensinger TECANYL GF30 (PPE, glass filled) data sheet, https://www.polymershapes.com/wp-content/uploads/2020/04/Polymershapes_Ensinger_DataSheet-TECANYL-GF30-natural.pdf (specific heat 1.2 J/(g K) and k 0.28 W/(K m), ISO 22007-4; glass-filled PPE grade)",
+  "iec": "IEC 60287-2-1 (thermal resistivity of EPR insulation 3.5 K m/W) and IEC 60853-2 (volumetric specific heat of EPR 2.0e6 J/(m3 K)) - standard values, not re-downloaded in this session"
+ },
+ "materials": {
+  "PVC": {"model": "paper_curves", "density": 1400.0, "density_source": "assumed (not given in the paper)", "k_source": "paper", "cp_source": "paper",
+          "k_20C": 0.142, "note": "paper Fig. 3c: 0.142 W/m K at 20 degC falling to 0.113 at 75 degC (held constant above). IEC 60287 uses 0.20 (rho_T = 5 K m/W)."},
+  "XLPE": {"model": "paper_curves", "density": 920.0, "density_source": "assumed (not given in the paper)", "k_source": "paper", "cp_source": "paper", "k_20C": 0.331},
+  "PTFE": {"model": "constant", "k": 0.25, "density": 2170.0, "cp": 1000.0, "k_source": "fluorotherm", "density_source": "fluorotherm", "cp_source": "fluororesin_table",
+           "note": "fluororesin_table gives k = 0.23"},
+  "FEP": {"model": "constant", "k": 0.20, "density": 2150.0, "cp": 1200.0, "k_source": "fluorotherm", "density_source": "fluorotherm", "cp_source": "fluororesin_table"},
+  "PFA": {"model": "constant", "k": 0.19, "density": 2150.0, "cp": 1000.0, "k_source": "fluorotherm", "density_source": "fluorotherm", "cp_source": "fluororesin_table"},
+  "ETFE": {"model": "constant", "k": 0.24, "density": 1740.0, "cp": 2000.0, "k_source": "fluorotherm", "density_source": "fluorotherm", "cp_source": "fluororesin_table"},
+  "PVDF": {"model": "constant", "k": 0.18, "density": 1780.0, "cp": 1200.0, "k_source": "arkema_kynar740", "density_source": "arkema_kynar740", "cp_source": "fluororesin_table",
+           "note": "fluororesin_table: k 0.17, density 1.75-1.78"},
+  "fluoropolymer_unspecified": {"model": "constant", "k": 0.22, "density": 2150.0, "cp": 1100.0, "k_source": "fluorotherm", "density_source": "fluorotherm", "cp_source": "fluororesin_table",
+           "note": "Alpha ThermoThin 'FLUOROPLASTIC' (type not disclosed): mean of PTFE/FEP/PFA/ETFE conductivities (0.19-0.25), density and cp of PTFE/FEP/PFA"},
+  "silicone_rubber": {"model": "constant", "k": 0.20, "density": 1200.0, "cp": 1256.0, "k_source": "shinetsu", "density_source": "tym_silicone", "cp_source": "momentive_rtv615",
+           "note": "filled HCR wire compounds: k 0.2-0.24 (TYM 0.24), RTV615 (unfilled) 0.19"},
+  "mPPE": {"model": "constant", "k": 0.27, "density": 1110.0, "cp": 1200.0, "k_source": "sabic_noryl_v0150b", "density_source": "sabic_noryl_v0150b", "cp_source": "ensinger_tecanyl_gf30",
+           "note": "modified PPE (PPE blend). Alpha EcoWire compound itself is not characterised publicly; cp from a glass-filled PPE grade (best available)"},
+  "EPR": {"model": "constant", "k": 0.2857, "density": 1300.0, "cp": 1538.0, "k_source": "iec", "density_source": "iec", "cp_source": "iec",
+          "note": "k = 1/3.5; density x cp = 2.0e6 J/(m3 K) (only the product matters)"}
+ },
+ "alpha_wire_mapping": {
+  "PVC": "PVC", "PVC, Irradiated": "PVC", "PVC, Semi Rigid": "PVC", "XLPE": "XLPE", "PTFE": "PTFE", "PTFE TAPE": "PTFE",
+  "ETFE": "ETFE", "FLUOROPLASTIC": "fluoropolymer_unspecified", "PVDF": "PVDF", "Silicone Rubber": "silicone_rubber",
+  "MPPE": "mPPE", "MPPE-TPE": "mPPE", "EPR Rubber": "EPR", "NYLON": "PVC",
+  "Mica Glass Tape": null, "PTFE Impregnated Fiberglass": null
+ },
+ "mapping_notes": {
+  "PTFE TAPE": "tape-wrapped PTFE modelled as solid PTFE (voids would lower k)",
+  "MPPE-TPE": "mPPE/TPE blend modelled with mPPE properties",
+  "NYLON": "thin nylon over-layer of THHN (0.005 in) modelled with PVC properties - no nylon data sourced",
+  "Mica Glass Tape": "no thermal property data found - parts not simulated",
+  "PTFE Impregnated Fiberglass": "no thermal property data found - parts not simulated"
+ }
+}

@@ -39,6 +39,17 @@ Eqs. (3a), (3b), (4a), (13a), (15a)::
 IEEE 738 prescribes using the LARGEST of q_c1, q_c2 and the natural-convection loss
 q_cn; ``h_surface`` does exactly that, so air_speed = 0 reproduces the paper.
 
+Natural convection for small diameters - NOT in the paper; optional ``model='churchill_chu'``.
+Eq. (25) is a power law (Nu ~ Ra^0.25) fitted for overhead conductors (D of order 10-50 mm). For
+thin hook-up wires (D < ~3 mm, Ra < ~10) it under-predicts h. The Churchill & Chu (1975)
+correlation for a horizontal cylinder is valid for 1e-5 <= Ra_D <= 1e12::
+
+    Nu_D = {0.60 + 0.387 Ra_D^(1/6) / [1 + (0.559/Pr)^(9/16)]^(8/27)}^2 ,  h = Nu_D k_f / D
+    Ra_D = g beta (Ts - Ta) D^3 / (nu alpha),  beta = 1/T_film[K]
+
+with the IEEE 738 air properties (rho_f Eq. 14a, mu_f Eq. 13a, k_f Eq. 15a) and c_p of air
+from Incropera & DeWitt Table A.4 (1006-1030 J/(kg K) for 250-500 K).
+
 Radiation - paper Eq. (23)/(27)::
 
     P_r = eps * sigma * pi * D * (T_s^4 - T_air^4)  with temperatures in K, eps = 0.85
@@ -64,11 +75,15 @@ def h_natural(T_surface_C, T_air_C, D: float, elevation_m: float = 0.0, model: s
     """Natural-convection heat-transfer coefficient h [W/(m² K)] for a horizontal
     cylinder of outer diameter D [m].
 
-    model = 'paper'   -> Eq. (25) exactly as printed (rho^0.25)
-    model = 'ieee738' -> corrected Eq. (25) consistent with IEEE 738-2012 (rho^0.5)
+    model = 'paper'         -> Eq. (25) exactly as printed (rho^0.25)
+    model = 'ieee738'       -> corrected Eq. (25) consistent with IEEE 738-2012 (rho^0.5)
+    model = 'churchill_chu' -> Churchill & Chu (1975) horizontal cylinder, valid down to Ra = 1e-5
+                               (use for thin wires; not part of the paper)
     """
     dT = np.abs(np.asarray(T_surface_C, dtype=float) - T_air_C)
     rho = air_density_ieee738(T_surface_C, T_air_C, elevation_m)
+    if model == "churchill_chu":
+        return h_churchill_chu(T_surface_C, T_air_C, D, elevation_m)
     if model == "paper":
         exp_rho = 0.25
     elif model == "ieee738":
@@ -145,3 +160,39 @@ def h_surface(T_surface_C, T_air_C, D: float, elevation_m: float = 0.0, model: s
     h_f = (wind_direction_factor(angle_deg) * air_conductivity_ieee738(T_film) / (np.pi * D)
            * np.maximum(1.01 + 1.35 * Re**0.52, 0.754 * Re**0.6))
     return np.maximum(h_n, h_f)
+
+
+# c_p of dry air at 1 atm, Incropera & DeWitt, Fundamentals of Heat and Mass Transfer, Table A.4
+_AIR_CP_T_K = (250.0, 300.0, 350.0, 400.0, 450.0, 500.0)
+_AIR_CP = (1006.0, 1007.0, 1009.0, 1014.0, 1021.0, 1030.0)
+GRAVITY = 9.80665
+
+
+def air_cp(T_film_C):
+    return np.interp(np.asarray(T_film_C, dtype=float) + KELVIN, _AIR_CP_T_K, _AIR_CP)
+
+
+def rayleigh_prandtl(T_surface_C, T_air_C, D: float, elevation_m: float = 0.0):
+    """Ra_D and Pr of air at the film temperature (IEEE 738 air properties)."""
+    Ts = np.asarray(T_surface_C, dtype=float)
+    T_film = 0.5 * (Ts + T_air_C)
+    rho = air_density_ieee738(Ts, T_air_C, elevation_m)
+    mu = air_viscosity_ieee738(T_film)
+    k = air_conductivity_ieee738(T_film)
+    cp = air_cp(T_film)
+    nu, alpha = mu / rho, k / (rho * cp)
+    beta = 1.0 / (T_film + KELVIN)
+    Ra = GRAVITY * beta * np.abs(Ts - T_air_C) * D**3 / (nu * alpha)
+    return Ra, mu * cp / k, k
+
+
+def h_churchill_chu(T_surface_C, T_air_C, D: float, elevation_m: float = 0.0):
+    """Churchill & Chu (1975) natural convection from a horizontal cylinder [W/(m² K)]."""
+    Ra, Pr, k = rayleigh_prandtl(T_surface_C, T_air_C, D, elevation_m)
+    return nusselt_churchill_chu(Ra, Pr) * k / D
+
+
+def nusselt_churchill_chu(Ra, Pr):
+    """Churchill & Chu (1975), horizontal isothermal cylinder, 1e-5 <= Ra <= 1e12."""
+    return (0.60 + 0.387 * np.asarray(Ra, dtype=float) ** (1.0 / 6.0)
+            / (1.0 + (0.559 / Pr) ** (9.0 / 16.0)) ** (8.0 / 27.0)) ** 2

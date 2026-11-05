@@ -20,6 +20,12 @@ On top of the paper, every formula was checked and the solver was verified indep
 issues found are in **[docs/FORMULAS.md](docs/FORMULAS.md)**; the numerical results are in
 **[results/RESULTS.md](results/RESULTS.md)**.
 
+The model is also applied to a **database of 337 real manufacturer wires (36 AWG to 1/0 AWG;
+PVC, silicone rubber, PTFE, XLPE, mPPE, ETFE, PVDF, EPR, fluoroplastic)** taken from Alpha Wire
+datasheets, and compared with manufacturer current ratings (Habia, RS PRO, Alpha Wire, General
+Cable): **[docs/WIRE_DATABASE.md](docs/WIRE_DATABASE.md)**,
+**[results/wires/RESULTS_WIRES.md](results/wires/RESULTS_WIRES.md)**.
+
 ## Quick start
 
 ```bash
@@ -147,16 +153,58 @@ the 150 mm² test worse, and that test fits best at 0 m/s, so a single air speed
 both tests. The too-fast early heating of the 70 mm² cable, which is driven by heat capacity, is
 also not affected by air movement.
 
+## Wire database (36 AWG to 1/0 AWG)
+
+```bash
+python -m cable_thermal wire-list --awg 22
+```
+
+```bash
+python -m cable_thermal wire --part 391250 --ambient 30 --current 8 --duration 600 --plot w.png
+```
+
+```bash
+python -m cable_thermal wire-study --out results/wires
+```
+
+* **Data:** 337 Alpha Wire hook-up wire parts parsed from the manufacturer's spec sheets: AWG,
+  stranding, plating, conductor and outer diameter, insulation material and wall, jacket,
+  temperature rating, voltage and DC resistance. Insulations covered: PVC 123, silicone 73,
+  PTFE 58, mPPE 24, XLPE 20, ETFE 11, fluoroplastic 11, PVDF 4, EPR 3, and mica-glass 10 (the
+  mica-glass parts are not simulated, as no thermal data exist).
+* **Reference ratings:** Habia PTFE type E (25 types), RS PRO PTFE type A (3), Alpha PV wire (3)
+  and Super Vu-Tron welding cable (6 AWG to 4/0, 8 sizes).
+* **Material properties:** k, ρ and c_p for each insulation, with the source of every value
+  (`cable_thermal/data/insulation_materials.json`).
+* **Convection:** for thin wires the paper's Eq. 25 is outside its range of validity, so the wire
+  study uses Churchill & Chu (option `--convection churchill_chu`). Eq. 25 under-predicts the
+  ampacity by about 16 % for wires under 1 mm OD.
+
+Comparison of the model with the manufacturers' ratings:
+
+| Data set | Model result |
+|---|---|
+| RS PRO PTFE, rated for a 40 K rise | 35–43 K rise at the published currents |
+| Alpha PV wire and Super Vu-Tron welding cable (90 °C, 8 AWG to 4/0) | 76–78 °C at the published currents, so the ratings are 0.87–0.89 × the model's 90 °C ampacity |
+| Habia PTFE (200 °C) | conductor at 112–191 °C at the published currents, so the ratings stay below the 200 °C limit |
+
+Figures are `results/wires/figures/fig20`–`fig26`; per-part results are in
+`results/wires/wire_results.csv`.
+
 ## Repository layout
 
 ```
 cable_thermal/      model.py (paper FDM/TDMA), cables.py (Tables 1-4), properties.py,
-                    heat_transfer.py (Eqs. 23-26), iec.py (IEC 60287 / 60949), reference.py
-                    (independent solver), reproduce.py (all figures), __main__.py (CLI)
-cable_thermal/data  digitized property curves and paper result curves (JSON)
-tools/              digitizers used to extract the curves from the paper's figures
-docs/FORMULAS.md    equation-by-equation check
+                    heat_transfer.py (Eqs. 23-26 + forced convection + Churchill-Chu), iec.py
+                    (IEC 60287 / 60949), reference.py (independent solver), reproduce.py (all
+                    figures), wires.py (wire database -> model), wire_study.py (wire campaign),
+                    __main__.py (CLI)
+cable_thermal/data  digitized property curves, paper result curves, insulation materials (JSON)
+cable_thermal/data/wires  Alpha Wire database (337 parts) and reference current ratings (JSON)
+tools/              digitizers for the paper's figures; Alpha Wire fetch/parse; reference parsers
+docs/               FORMULAS.md (equation check), WIRE_DATABASE.md (wire data, sources, method)
 results/            figures, RESULTS.md, summary.json, CSV time series
+results/wires/      wire campaign: RESULTS_WIRES.md, wire_results.csv, comparisons.json, figures
 tests/              verification tests
 ```
 

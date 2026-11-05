@@ -113,3 +113,23 @@ With a draught of about 0.18 m/s the 70 mm² test agrees with the paper (RMS 0.7
 3.5 K), but the 150 mm² test agrees best at 0 m/s, so air movement alone does not explain the
 70 mm² discrepancy (see `results/RESULTS.md` §8 and `fig19`).
 | Long transient → steady state | identical to 1e-3 K |
+
+## 9. Validity range of Eq. (25) for thin wires (wire database extension)
+
+Eq. (25) is IEEE 738's natural-convection power law (Nu ∝ Ra^0.25), derived for overhead
+conductors. Its validity was checked against the Churchill & Chu (1975) correlation for a
+horizontal cylinder, Nu = {0.60 + 0.387 Ra^(1/6)/[1 + (0.559/Pr)^(9/16)]^(8/27)}², which is valid
+for 10⁻⁵ ≤ Ra ≤ 10¹²:
+
+| Outer diameter | Ra (ΔT = 10–100 K) | h, Eq. 25 / Churchill–Chu |
+|---|---|---|
+| 0.5 mm | 0.1–0.6 | 0.42–0.53 |
+| 1 mm | 1–5 | 0.57–0.68 |
+| 3 mm | 27–140 | 0.83–0.92 |
+| 14.7 mm (paper, 70 mm² cable) | 3·10³–1.6·10⁴ | 1.09 |
+| 24 mm (paper, 150 mm² cable) | 1.4·10⁴–7·10⁴ | 1.09–1.12 |
+
+So Eq. 25 is adequate for the paper's cables, within about 10 % of Churchill–Chu, but not for
+hook-up wires. That is why the wire study uses Churchill–Chu (`convection_model="churchill_chu"`).
+The RS PRO 40 K-rise ratings support this choice: Churchill–Chu gives 35–43 K at the published
+currents, while Eq. 25 gives 52–58 K.
