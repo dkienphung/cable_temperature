@@ -105,7 +105,7 @@ plot(t, r.p_rad(2:end), '-', 'color', P.blue, 'linewidth', 1.8, 'displayname', '
 hb = D.fig10b_cable70_heat_terms;
 plot(hb.Pc(:, 1), hb.Pc(:, 2), ':', 'color', P.orange, 'linewidth', 1.8, 'displayname', 'P_c (paper Fig. 10b)');
 plot(hb.Pr(:, 1), hb.Pr(:, 2), ':', 'color', P.blue, 'linewidth', 1.8, 'displayname', 'P_r (paper Fig. 10b)');
-xlabel('Time [s]'); ylabel('Per unit length heat terms [W/m]'); ct_legend('northwest');
+xlim([0 r.t(end)]); xlabel('Time [s]'); ylabel('Per unit length heat terms [W/m]'); ct_legend('northwest');
 title('Components of the heat balance, 70 mm2 (cf. paper Fig. 10b)');
 ct_save_fig(f, fullfile(out, 'fig10b_cable70_heat_balance.png'));
 log_lines{end + 1} = sprintf('cable70 heat balance at 8600 s: joule=%.3f pc=%.3f pr=%.3f W/m', r.joule(end), r.p_conv(end), r.p_rad(end));
