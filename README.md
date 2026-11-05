@@ -26,6 +26,10 @@ datasheets, and compared with manufacturer current ratings (Habia, RS PRO, Alpha
 Cable): **[docs/WIRE_DATABASE.md](docs/WIRE_DATABASE.md)**,
 **[results/wires/RESULTS_WIRES.md](results/wires/RESULTS_WIRES.md)**.
 
+**MATLAB / Octave / Simulink version:** the folder [`matlab/`](matlab/README.md) contains a
+self-contained port: the model, the paper study, the wire database study, tests with Python
+parity, and a Simulink model builder.
+
 ## Quick start
 
 ```bash
@@ -203,6 +207,7 @@ cable_thermal/data  digitized property curves, paper result curves, insulation m
 cable_thermal/data/wires  Alpha Wire database (337 parts) and reference current ratings (JSON)
 tools/              digitizers for the paper's figures; Alpha Wire fetch/parse; reference parsers
 docs/               FORMULAS.md (equation check), WIRE_DATABASE.md (wire data, sources, method)
+matlab/             MATLAB / Octave port (core, heat, iec, wires, simulink, run_*.m scripts)
 results/            figures, RESULTS.md, summary.json, CSV time series
 results/wires/      wire campaign: RESULTS_WIRES.md, wire_results.csv, comparisons.json, figures
 tests/              verification tests

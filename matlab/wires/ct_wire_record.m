@@ -1,0 +1,9 @@
+function w = ct_wire_record(source, part, awg, d, area, r20, r20_source, layer_keys, layer_t, od, tmax, label, notes, rating)
+%CT_WIRE_RECORD  Normalised wire description in SI units (same as the Python WireRecord).
+if nargin < 13, notes = {}; end
+if nargin < 14, rating = NaN; end
+w = struct('source', source, 'part_number', part, 'awg', awg, 'conductor_diameter', d, 'metal_area', area, ...
+           'r20', r20, 'r20_source', r20_source, 'layer_keys', {layer_keys}, 'layer_t', layer_t, ...
+           'outer_diameter', od, 'temp_max_C', tmax, 'insulation_label', label, 'notes', {notes}, ...
+           'rating_A', rating, 'simulatable', all(~cellfun(@isempty, layer_keys)));
+end

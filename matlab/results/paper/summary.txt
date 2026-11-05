@@ -1,0 +1,17 @@
+cable70 Eq25=paper end_model=45.099/43.798/40.438 end_paper=39.309/37.522/35.206 rms=3.718 mean=+3.553
+cable70 Eq25=ieee738 end_model=44.770/43.471/40.118 end_paper=39.309/37.522/35.206 rms=3.524 mean=+3.373
+cable150 Eq25=paper end_model=38.743/37.311/34.582 end_paper=39.542/37.854/37.001 rms=0.703 mean=-0.550
+cable150 Eq25=ieee738 end_model=38.685/37.247/34.503 end_paper=39.542/37.854/37.001 rms=0.727 mean=-0.569
+cable70 heat balance at 8600 s: joule=13.143 pc=7.399 pr=5.219 W/m
+cable70 ampacity90=338.22 iec_paper_k=354.30 iec_rhoT=371.55
+cable150 ampacity90=548.50 iec_paper_k=560.99 iec_rhoT=595.54
+short_circuit Isc=9274.8 K=203.36 beta=212.56 model_peak=233.83 iec_adiabatic=250.00 iec_nonadiabatic=231.87
+cable70 air_speed=0.00 end=44.770 rms=3.524
+cable70 air_speed=0.10 end=43.089 rms=2.051
+cable70 air_speed=0.20 end=39.215 rms=0.792
+cable70 air_speed=0.30 end=37.093 rms=1.698
+cable150 air_speed=0.00 end=38.685 rms=0.727
+cable150 air_speed=0.10 end=38.050 rms=1.058
+cable150 air_speed=0.20 end=37.231 rms=1.427
+cable150 air_speed=0.30 end=36.704 rms=1.668
+diagnostic_fit capacity_scale=2.340 h_scale=1.350 rms=0.405

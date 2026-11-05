@@ -1,0 +1,20 @@
+TDMA = dense solve                                             PASS  max diff 5.6e-17
+sparse tridiagonal solve = dense solve                         PASS  max diff 5.6e-17
+mesh areas, perimeters, mass: cable70                          PASS  28 nodes
+mesh areas, perimeters, mass: cable150                         PASS  28 nodes
+energy balance (explicit radiation)                            PASS  6.2e-10 W/m
+energy balance (linearized radiation)                          PASS  7.2e-10 W/m
+steady state vs analytic (N = 9)                               PASS  dT_AB err 2.0e-04 K
+steady state vs analytic (N = 40)                              PASS  dT_AB err 1.0e-05 K
+adiabatic short circuit = IEC 60949                            PASS  K = 225.7, model 249.93 vs IEC 249.95 degC
+Eq. 25 corrected = IEEE 738 q_cn; printed differs by rho^0.25  PASS  
+Eq. 26 needs degC (kelvin reading gives ~0.6 kg/m3)            PASS  
+Churchill-Chu Nusselt (hand value, Ra->0 limit)                PASS  Nu(1e4) = 4.366
+thin wire: Churchill-Chu h > 1.6 x Eq. 25                      PASS  
+IEC 60287 free-air iteration                                   PASS  I = 336.1 A
+Python parity, test sequence cable70                           PASS  max |dT| 5.0e-05 K (CSV has 6 digits)
+Python parity, test sequence cable150                          PASS  max |dT| 5.0e-05 K (CSV has 6 digits)
+Python parity, ampacity of 10 database wires                   PASS  max rel. diff 3.7e-06
+Simulink step (Unit Delay + lookup + ct_simulink_step) = ct_simulate PASS  max |dT| 0.0e+00 K
+wire database: 337 parts, 36 ... 1/0 AWG, AWG/stranding parsing PASS  
+0 test(s) failed

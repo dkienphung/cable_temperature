@@ -1,0 +1,51 @@
+Habia E 3201  32 AWG rating  3 A: T at rating 112 (Eq.25 147) degC, I(200 degC) 4.3 (Eq.25 3.6) A
+Habia E 3207  32 AWG rating  3 A: T at rating 112 (Eq.25 146) degC, I(200 degC) 4.3 (Eq.25 3.6) A
+Habia E 3001  30 AWG rating  4 A: T at rating 120 (Eq.25 158) degC, I(200 degC) 5.5 (Eq.25 4.6) A
+Habia E 3007  30 AWG rating  4 A: T at rating 112 (Eq.25 145) degC, I(200 degC) 5.8 (Eq.25 4.9) A
+Habia E 2801  28 AWG rating  6 A: T at rating 149 (Eq.25 195) degC, I(200 degC) 7.2 (Eq.25 6.1) A
+Habia E 2807  28 AWG rating  6 A: T at rating 139 (Eq.25 179) degC, I(200 degC) 7.5 (Eq.25 6.4) A
+Habia E 2601  26 AWG rating  8 A: T at rating 156 (Eq.25 201) degC, I(200 degC) 9.3 (Eq.25 8.0) A
+Habia E 2607  26 AWG rating  8 A: T at rating 144 (Eq.25 181) degC, I(200 degC) 9.8 (Eq.25 8.5) A
+Habia E 2619  26 AWG rating  8 A: T at rating 137 (Eq.25 171) degC, I(200 degC) 10.1 (Eq.25 8.8) A
+Habia E 2401  24 AWG rating 10 A: T at rating 146 (Eq.25 182) degC, I(200 degC) 12.1 (Eq.25 10.6) A
+Habia E 2407  24 AWG rating 10 A: T at rating 133 (Eq.25 162) degC, I(200 degC) 12.9 (Eq.25 11.4) A
+Habia E 2419  24 AWG rating 10 A: T at rating 129 (Eq.25 156) degC, I(200 degC) 13.2 (Eq.25 11.6) A
+Habia E 2201  22 AWG rating 14 A: T at rating 162 (Eq.25 199) degC, I(200 degC) 15.9 (Eq.25 14.1) A
+Habia E 2207  22 AWG rating 14 A: T at rating 148 (Eq.25 177) degC, I(200 degC) 16.8 (Eq.25 15.1) A
+Habia E 2219  22 AWG rating 14 A: T at rating 141 (Eq.25 167) degC, I(200 degC) 17.4 (Eq.25 15.6) A
+Habia E 2001  20 AWG rating 19 A: T at rating 169 (Eq.25 202) degC, I(200 degC) 21.0 (Eq.25 18.9) A
+Habia E 2007  20 AWG rating 19 A: T at rating 154 (Eq.25 180) degC, I(200 degC) 22.3 (Eq.25 20.3) A
+Habia E 2019  20 AWG rating 19 A: T at rating 146 (Eq.25 169) degC, I(200 degC) 23.1 (Eq.25 21.0) A
+Habia E 1801  18 AWG rating 27 A: T at rating 191 (Eq.25 223) degC, I(200 degC) 27.7 (Eq.25 25.3) A
+Habia E 1807  18 AWG rating 27 A: T at rating 171 (Eq.25 194) degC, I(200 degC) 29.7 (Eq.25 27.5) A
+Habia E 1819  18 AWG rating 27 A: T at rating 162 (Eq.25 184) degC, I(200 degC) 30.7 (Eq.25 28.4) A
+Habia E 1601  16 AWG rating 32 A: T at rating 157 (Eq.25 176) degC, I(200 degC) 37.1 (Eq.25 34.6) A
+Habia E 1619  16 AWG rating 32 A: T at rating 163 (Eq.25 181) degC, I(200 degC) 36.3 (Eq.25 34.0) A
+Habia E 1419  14 AWG rating 43 A: T at rating 166 (Eq.25 179) degC, I(200 degC) 48.3 (Eq.25 45.9) A
+Habia E 1219  12 AWG rating 59 A: T at rating 172 (Eq.25 182) degC, I(200 degC) 64.9 (Eq.25 62.5) A
+Habia ambient factors (published): 20:1.08 40:1.00 60:0.92 80:0.84 100:0.75 120:0.65 140:0.55 160:0.42 180:0.28 
+model E 3007: 20:1.06 40:1.00 60:0.94 80:0.87 100:0.80 120:0.72 140:0.63 160:0.51 180:0.36 
+model E 2219: 20:1.06 40:1.00 60:0.94 80:0.88 100:0.80 120:0.72 140:0.63 160:0.51 180:0.36 
+model E 1419: 20:1.05 40:1.00 60:0.94 80:0.88 100:0.81 120:0.73 140:0.63 160:0.52 180:0.36 
+RS PRO 26 AWG 7/0.15  rating 4 A: rise 34.7 K (Eq.25 52.3 K), I(40 K) 4.30 A
+RS PRO 24 AWG 7/0.20  rating 6 A: rise 39.5 K (Eq.25 55.9 K), I(40 K) 6.04 A
+RS PRO 22 AWG 19/0.15 rating 8 A: rise 42.9 K (Eq.25 57.8 K), I(40 K) 7.72 A
+Alpha PV0830 8 AWG rating 80 A: T at rating 77.5 degC, I(90 degC) 89.7 A (Eq.25 91.0 A)
+Alpha PV0630 6 AWG rating 105 A: T at rating 77.3 degC, I(90 degC) 117.9 A (Eq.25 119.8 A)
+Alpha PV0430 4 AWG rating 140 A: T at rating 77.6 degC, I(90 degC) 156.9 A (Eq.25 159.7 A)
+Super Vu-Tron 6   AWG rating 105 A: T at rating 75.6 degC, I(90 degC) 121 / 121 / 120 A (packing 0.75/0.80/0.85)
+Super Vu-Tron 4   AWG rating 140 A: T at rating 76.0 degC, I(90 degC) 161 / 160 / 159 A (packing 0.75/0.80/0.85)
+Super Vu-Tron 2   AWG rating 190 A: T at rating 77.0 degC, I(90 degC) 216 / 215 / 214 A (packing 0.75/0.80/0.85)
+Super Vu-Tron 1   AWG rating 220 A: T at rating 76.6 degC, I(90 degC) 252 / 250 / 249 A (packing 0.75/0.80/0.85)
+Super Vu-Tron 1/0 AWG rating 260 A: T at rating 78.0 degC, I(90 degC) 293 / 291 / 289 A (packing 0.75/0.80/0.85)
+Super Vu-Tron 2/0 AWG rating 300 A: T at rating 77.6 degC, I(90 degC) 339 / 337 / 335 A (packing 0.75/0.80/0.85)
+Super Vu-Tron 3/0 AWG rating 350 A: T at rating 77.3 degC, I(90 degC) 398 / 395 / 392 A (packing 0.75/0.80/0.85)
+Super Vu-Tron 4/0 AWG rating 405 A: T at rating 76.7 degC, I(90 degC) 463 / 459 / 456 A (packing 0.75/0.80/0.85)
+3051 PVC 0.016" (UL1007): steady conductor 64.9 degC, after 60 s 60.6 degC
+3071 PVC 0.032" (UL1015): steady conductor 60.5 degC, after 60 s 52.1 degC
+5855/7 PTFE 0.010": steady conductor 63.6 degC, after 60 s 59.9 degC
+39X2205 Silicone 0.020": steady conductor 59.6 degC, after 60 s 54.8 degC
+6713 mPPE 0.0095": steady conductor 66.1 degC, after 60 s 64.2 degC
+7024 XLPE 0.016": steady conductor 59.7 degC, after 60 s 53.8 degC
+AZ221934 ETFE 0.011": steady conductor 63.1 degC, after 60 s 55.6 degC
+2622 Fluoroplastic 0.007": steady conductor 67.4 degC, after 60 s 64.1 degC
