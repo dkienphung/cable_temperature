@@ -73,7 +73,7 @@ for gi = 1:numel(groups)
 end
 set(gca, 'yscale', 'log', 'xtick', 1:numel(awgs), 'xticklabel', awgs, 'fontsize', 8);
 xlabel('Conductor size [AWG]'); ylabel('Model ampacity [A]'); ct_legend('northwest');
-title(ct_lbl(sprintf('Ampacity at the rated conductor temperature, still air %g %sC (%s)', AMBIENT, deg, CONV)));
+title(ct_lbl(sprintf('Ampacity at the rated conductor temperature, still air %g %sC (%s)', AMBIENT, deg, strrep(CONV, '_', '-'))));
 ct_save_fig(f, fullfile(out, 'fig21_wire_ampacity_by_material.png'));
 
 %% 3. Comparison with manufacturer current ratings
@@ -153,8 +153,10 @@ subplot(1, 2, 2); hold on; box on; grid on;
 plot(1:size(H, 1), H(:, 2), 'o-', 'color', P.violet, 'markerfacecolor', P.violet, 'displayname', 'Churchill-Chu');
 plot(1:size(H, 1), H(:, 3), 'o--', 'color', P.violet, 'displayname', 'Eq. 25 (paper)');
 plot([1 size(H, 1)], [200 200], '-', 'color', P.red, 'displayname', ct_lbl(['PTFE rating 200 ' deg 'C']));
-set(gca, 'xtick', 1:size(H, 1), 'xticklabel', cellfun(@(r) strrep(r.type, 'E ', ''), hrows, 'uniformoutput', false), 'fontsize', 7);
-xlabel('Habia type E'); ylabel(ct_lbl(['Model conductor temperature at rating [' deg 'C]'])); ct_legend('southeast');
+awg_h = cellfun(@(r) r.awg, hrows, 'uniformoutput', false);
+first = [true, ~strcmp(awg_h(2:end), awg_h(1:end - 1))];
+set(gca, 'xtick', find(first), 'xticklabel', awg_h(first), 'fontsize', 8);
+xlabel('Habia type E, AWG (solid / 7 / 19 strand variants of each size)'); ylabel(ct_lbl(['Model conductor temperature at rating [' deg 'C]'])); ct_legend('southeast');
 title(ct_lbl(['Habia PTFE: temperature at the published current, 40 ' deg 'C air']));
 ct_save_fig(f, fullfile(out, 'fig23_model_vs_manufacturer_ratings.png'));
 
