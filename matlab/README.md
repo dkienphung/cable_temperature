@@ -13,7 +13,9 @@ This folder is a self-contained MATLAB port of the Python package (`cable_therma
 * a builder for a Simulink model.
 
 Requirements: MATLAB R2016b or newer (for `jsondecode` and `strjoin`), with no toolboxes.
-GNU Octave 7 or newer also works, and all scripts were run with Octave 8.4.
+GNU Octave 7 or newer also works, and all scripts were run with Octave 8.4. For headless
+Octave, run the scripts under `xvfb-run octave --no-gui` so that the Qt renderer is used; without a
+display the code falls back to gnuplot, which renders the figures less well.
 
 ## Quick start
 
